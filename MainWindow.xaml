@@ -6,19 +6,46 @@
         xmlns:local="clr-namespace:TransformInsureJToMyReport"
         mc:Ignorable="d"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
+        fw:AcrylicWindow.Enabled="True"
+        fw:AcrylicWindow.AcrylicWindowStyle="None"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize"
-        WindowStyle="None"
-        Title="MainWindow" Height="400" Width="600">
+        ResizeMode="NoResize" FontSize="15"
+        Title="MainWindow" Height="330" Width="400"
+        MouseDown="Window_MouseDown">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" HorizontalAlignment="Right">
-            <materialDesign:PackIcon Kind="CloseOctagon" Margin="10" Foreground="White"/>
+        <StackPanel Grid.Row="0" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Style="{StaticResource MaterialDesignIconButton}" HorizontalAlignment="Right"
+                    Width="30" Height="30" IsTabStop="False" Click="Button_Click">
+                <materialDesign:PackIcon Kind="CloseOctagonOutline" Height="20"/>
+            </Button>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1">
+            <TextBlock FontSize="20" FontWeight="Medium" Foreground="DarkRed"                    
+                       Text="TÙY BIẾN BÁO CÁO" HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2">
+            <TextBlock Text="File đầu vào:" Margin="10 0" FontSize="12"/>
+
+            <Border BorderBrush="White" BorderThickness="0 1" Height="160" Margin="10 5">
+                <ListBox x:Name="SourceFiles" FontSize="10"
+                         ItemsSource="{Binding InsureJFiles, Mode=OneWay}"/>
+            </Border>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Add" Margin="10 0" Click="AddButton_Click"/>
+            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Remove" Margin="10 0" Click="RemoveButton_Click"/>
+            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Export" Margin="10 0"/>
         </StackPanel>
     </Grid>
 </Window>
