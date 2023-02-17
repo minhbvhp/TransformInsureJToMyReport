@@ -38,7 +38,7 @@
         <StackPanel Grid.Row="2">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
@@ -47,8 +47,8 @@
                         <TextBlock Text="Đơn chưa nhập:" Margin="10 0" FontSize="10"/>
                     </StackPanel>
 
-                    <Border BorderBrush="DeepSkyBlue" BorderThickness="0.5" Margin="10 5" Padding="5 0" Height="150">
-                        <ListBox FontSize="12" ItemsSource="{Binding IJNotInReport}"/>
+                    <Border BorderBrush="DeepSkyBlue" BorderThickness="0.5" Margin="10 5" Padding="0" Height="150">
+                        <ListBox FontSize="10" ItemsSource="{Binding IJNotInReport}"/>
                     </Border>
 
                     <Button Style="{StaticResource MaterialDesignOutlinedButton}"
@@ -64,7 +64,8 @@
 
                     <Border BorderBrush="DeepSkyBlue" BorderThickness="0.5" Margin="10 5" Height="150">
                         <ListBox x:Name="SourceFiles" FontSize="12"
-                         ItemsSource="{Binding InsureJFiles, UpdateSourceTrigger=PropertyChanged}"/>
+                                 ItemsSource="{Binding InsureJFiles, UpdateSourceTrigger=PropertyChanged}"
+                                 SelectedItem="{Binding SelectedInsureJFile, UpdateSourceTrigger=PropertyChanged}"/>
                     </Border>
                 </StackPanel>
 
@@ -74,8 +75,8 @@
         
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Thêm" Margin="10 0" Command="{Binding AddFilesCommand}"/>
-            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Xóa" Margin="10 0" Command="{Binding RemoveFilesCommand}"/>
+            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Thêm" Margin="10 0" Command="{Binding AddFileCommand}"/>
+            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Xóa" Margin="10 0" Command="{Binding RemoveFileCommand}"/>
             <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="120" Content="Xuất báo cáo" Margin="10 0" Command="{Binding ExportReportCommand}"/>
         </StackPanel>
     </Grid>

@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -16,6 +17,13 @@ namespace TransformInsureJToMyReport.ViewModel
 {
     internal partial class MainViewModel : ObservableObject
     {
+        [ObservableProperty]
+        private ObservableCollection<string> insureJFiles = new();
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(RemoveFileCommand))]
+        private string selectedInsureJFile;
+
         #region IJNotInReport
         [ObservableProperty]
         private List<string> iJNotInReport;
@@ -68,19 +76,44 @@ namespace TransformInsureJToMyReport.ViewModel
             }
         }
         #endregion
-
-        #region ExportReport
-        [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(ExportReportCommand))]
-        private List<string>? insureJFiles;
-
-        private bool CanExportReport()
+       
+        #region AddFile
+        [RelayCommand]
+        private void AddFile()
         {
-            return InsureJFiles is not null;
+            var dialog = new OpenFileDialog();
+            dialog.Filter = "Workbook (*.xlsx)|*.xlsx";
+            dialog.Title = "Chọn file trích xuất trực tiếp từ InsureJ";
+
+            if (dialog.ShowDialog() == true)
+            {
+                if (!InsureJFiles.Contains(dialog.FileName))
+                {
+                    InsureJFiles.Add(dialog.FileName);
+                    ExportReportCommand.NotifyCanExecuteChanged();
+                }
+            }
         }
+        #endregion
+
+        #region RemoveFile
+        private bool CanRemove()
+            => SelectedInsureJFile != null;
+
+        [RelayCommand(CanExecute = nameof(CanRemove))]
+        private void RemoveFile()
+        {            
+            InsureJFiles.Remove(SelectedInsureJFile);
+            ExportReportCommand.NotifyCanExecuteChanged();
+        }
+        #endregion
+
+        #region ExportReport       
+        private bool CanExportReport()
+            => InsureJFiles.Any();
 
         [RelayCommand(CanExecute = nameof(CanExportReport))]
-        private async Task ExportReport()
+        private void ExportReport()
         {
             foreach (string insureJFile in InsureJFiles)
             {
@@ -92,16 +125,13 @@ namespace TransformInsureJToMyReport.ViewModel
                         ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
                         int rowCount = worksheet.Dimension.End.Row;
 
-                        MessageBox.Show("File có {0} dòng", rowCount.ToString());
+                        MessageBox.Show("File có " + rowCount.ToString() + "dòng");
                     }
                 }
             }
         }
 
         #endregion
-
-
-
 
         public MainViewModel()
         {
