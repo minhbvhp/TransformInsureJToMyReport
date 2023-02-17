@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using TransformInsureJToMyReport.ViewModel;
 
 namespace TransformInsureJToMyReport
 {
@@ -24,6 +25,7 @@ namespace TransformInsureJToMyReport
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new MainViewModel();
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)

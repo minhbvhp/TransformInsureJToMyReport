@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
+    <PackageReference Include="EPPlus" Version="6.1.2" />
     <PackageReference Include="FluentWPF" Version="0.10.2" />
     <PackageReference Include="MaterialDesignColors" Version="2.1.1" />
     <PackageReference Include="MaterialDesignThemes" Version="4.7.1" />

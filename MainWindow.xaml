@@ -17,8 +17,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="40"/>
-            <RowDefinition Height="200"/>
-            <RowDefinition Height="70"/>
+            <RowDefinition Height="210"/>
+            <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" HorizontalAlignment="Right" Orientation="Horizontal">
@@ -38,20 +38,25 @@
         <StackPanel Grid.Row="2">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="110"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0">
-                    <TextBlock Text="Đơn chưa nhập:" Margin="10 0" FontSize="10"/>
+                    <StackPanel>
+                        <TextBlock Text="Đơn chưa nhập:" Margin="10 0" FontSize="10"/>
+                    </StackPanel>
 
-                    <Border BorderBrush="DeepSkyBlue" BorderThickness="0.5" Margin="10 5" Height="150">
-                        <ListBox FontSize="12">
-                            <TextBlock Text="Hello"/>
-                            <TextBlock Text="Hello"/>
-                            <TextBlock Text="Hello"/>
-                        </ListBox>
+                    <Border BorderBrush="DeepSkyBlue" BorderThickness="0.5" Margin="10 5" Padding="5 0" Height="150">
+                        <ListBox FontSize="12" ItemsSource="{Binding IJNotInReport}"/>
                     </Border>
+
+                    <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                            HorizontalAlignment="Center" Height="25" Width="50"
+                            Content="{materialDesign:PackIcon Kind=Upload}"
+                            materialDesign:ButtonProgressAssist.IsIndicatorVisible="True"
+                            materialDesign:ButtonProgressAssist.IsIndeterminate="{Binding UploadIJNotInReportCommand.IsRunning}"
+                            Command="{Binding UploadIJNotInReportCommand}"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1">
@@ -64,14 +69,14 @@
                 </StackPanel>
 
             </Grid>
-                <Border BorderBrush="White" BorderThickness="0 0 0 0.5" Margin="10 5" Grid.ColumnSpan="2" Height="13"/>
+                <Border BorderBrush="White" BorderThickness="0 0.5 0 0" Margin="10 8" Grid.ColumnSpan="2"/>
         </StackPanel>
         
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Add" Margin="10 0" Click="AddButton_Click"/>
-            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Remove" Margin="10 0" Click="RemoveButton_Click"/>
-            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Export" Margin="10 0"/>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Thêm" Margin="10 0" Click="AddButton_Click"/>
+            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Xóa" Margin="10 0" Click="RemoveButton_Click"/>
+            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="120" Content="Xuất báo cáo" Margin="10 0"/>
         </StackPanel>
     </Grid>
 </Window>
