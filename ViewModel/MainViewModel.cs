@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,6 +16,9 @@ namespace TransformInsureJToMyReport.ViewModel
 {
     internal partial class MainViewModel : ObservableObject
     {
+        #region IJNotInReport
+        [ObservableProperty]
+        private List<string> iJNotInReport;
         private IEnumerable<string> ReadUploadIJNotInReportFile(string filePath)
         {
             if (File.Exists(filePath))
@@ -45,9 +49,6 @@ namespace TransformInsureJToMyReport.ViewModel
             }
         }
 
-        [ObservableProperty]
-        private List<string>? iJNotInReport;
-
         [RelayCommand]
         private async Task UploadIJNotInReport()
         {
@@ -64,8 +65,47 @@ namespace TransformInsureJToMyReport.ViewModel
                 {
                     IJNotInReport = await Task.Run(() => ReadUploadIJNotInReportFile(fileName).ToList());
                 }
-            }                            
+            }
         }
+        #endregion
+
+        #region ExportReport
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(ExportReportCommand))]
+        private List<string>? insureJFiles;
+        partial void OnInsureJFilesChanged(List<string>? value)
+        {
+            MessageBox.Show("đã thay đổi");
+        }
+
+        private bool CanExportReport()
+        {
+            return InsureJFiles is not null;
+        }
+
+        [RelayCommand(CanExecute = nameof(CanExportReport))]
+        private async Task ExportReport()
+        {
+            foreach (string insureJFile in InsureJFiles)
+            {
+                if (File.Exists(insureJFile))
+                {
+                    using (ExcelPackage package = new ExcelPackage(insureJFile))
+                    {
+                        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                        int rowCount = worksheet.Dimension.End.Row;
+
+                        MessageBox.Show("File có {0} dòng", rowCount.ToString());
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+
+
 
         public MainViewModel()
         {
