@@ -73,10 +73,6 @@ namespace TransformInsureJToMyReport.ViewModel
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(ExportReportCommand))]
         private List<string>? insureJFiles;
-        partial void OnInsureJFilesChanged(List<string>? value)
-        {
-            MessageBox.Show("đã thay đổi");
-        }
 
         private bool CanExportReport()
         {
