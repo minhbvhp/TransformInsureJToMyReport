@@ -1,15 +1,18 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Xml.Linq;
 
 namespace TransformInsureJToMyReport.ViewModel
 {
@@ -17,6 +20,103 @@ namespace TransformInsureJToMyReport.ViewModel
     {
         private Dictionary<string, int> _allTitle = new Dictionary<string, int>();
         private List<List<string>> _allMatchDataFetchFromIJFile = new();
+
+        private List<List<string>> CustomListConverted(List<List<string>> list)
+        {
+            foreach (var row in list)
+            {
+                for (int i = 0; i < row.Count; i++)
+                {
+                    switch (row[i].ToString())
+                    {
+                        case "Bảo hiểm cháy nổ bắt buộc":
+                            row[i] = "BH Cháy nổ bắt buộc(CNBB) +BH cháy và các RR đặc biệt(FI)";
+                            break;
+
+                        case "Bảo hiểm Cháy và rủi ro đặc biệt":
+                            row[i] = "BH Cháy nổ bắt buộc(CNBB) +BH cháy và các RR đặc biệt(FI)";
+                            break;
+
+                        case "Bảo hiểm máy móc và thiết bị xây dựng":
+                            row[i] = "BH Máy móc và thiết bị xây dựng (CPM)";
+                            break;
+
+                        case "Bảo hiểm công trình dân dụng hoàn thành":
+                            row[i] = "BH Công trình xây dựng đã hoàn thành (CECR)";
+                            break;
+
+                        case "BH trách nhiệm công cộng":
+                            row[i] = "BH Trách nhiệm công cộng (PBL)";
+                            break;
+
+                        case "Bảo hiểm mọi rủi ro tài sản":
+                            row[i] = "BH Mọi rủi ro tài sản (PAR)";
+                            break;
+
+                        case "VND":
+                            row[i] = "VNĐ";
+                            break;
+
+                        case "HP Phòng Bảo hiểm Cháy - Kỹ thuật":
+                            row[i] = "P. SỐ 7";
+                            break;
+
+                        case "HP Phòng Bảo hiểm Tàu thủy":
+                            row[i] = "P. TÀU THỦY";
+                            break;
+
+                        case "HP Phòng Bảo hiểm Hàng hóa":
+                            row[i] = "P. HÀNG HÓA";
+                            break;
+
+                        case "HP Phòng Bảo hiểm Số 1":
+                            row[i] = "P. SỐ 1";
+                            break;
+
+                        case "HP Phòng Bảo hiểm Số 2":
+                            row[i] = "P. SỐ 2";
+                            break;
+
+                        case "HP Phòng Bảo hiểm Số 3":
+                            row[i] = "P. SỐ 3";
+                            break;
+
+                        case "HP Phòng Bảo hiểm Số 4":
+                            row[i] = "P. SỐ 4";
+                            break;
+
+                        case "HP Phòng Bảo hiểm Số 5":
+                            row[i] = "P. SỐ 5";
+                            break;
+
+                        case "HP Phòng Bảo hiểm Số 6":
+                            row[i] = "P. SỐ 6";
+                            break;
+
+                        case "HP Phòng Bảo hiểm Số 7":
+                            row[i] = "P. SỐ 7";
+                            break;
+
+                        case "HP Phòng Bảo hiểm Số 8":
+                            row[i] = "P. SỐ 8";
+                            break;
+
+                        case "HP Phòng Bảo hiểm Số 9":
+                            row[i] = "P. SỐ 9";
+                            break;
+
+                        case "HP Phòng Bảo hiểm Số 10":
+                            row[i] = "P. SỐ 10";
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            return list;
+        }
         private int GetUsefulCategory(HashSet<string> strings, List<string> substrings)
         {
             int i = 0;
@@ -28,8 +128,11 @@ namespace TransformInsureJToMyReport.ViewModel
                     return i;
                 }
             }
-            throw new ArgumentNullException("Substring not match strings");
+            return 1;
         }
+
+        [ObservableProperty]
+        private SnackbarMessageQueue _message = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
 
         [ObservableProperty]
         private ObservableCollection<string> insureJFiles = new();
@@ -132,6 +235,7 @@ namespace TransformInsureJToMyReport.ViewModel
                 ["Ngày tạo đơn"] = GetUsefulCategory(indicators, new List<string>{"N.Nhập"}),
                 ["PKD"] = GetUsefulCategory(indicators, new List<string>{"Đơn vị KD cấp dưới"}),
                 ["Sản phẩm bảo hiểm"] = GetUsefulCategory(indicators, new List<string>{"Sản phẩm", "Tên sản phẩm"}),
+                ["Khách hàng"] = GetUsefulCategory(indicators, new List<string> { "mua BH" }),
                 ["Trung gian"] = GetUsefulCategory(indicators, new List<string>{"Đại lý", "Bên trung gian"}),
                 ["Số tiền bảo hiểm"] = GetUsefulCategory(indicators, new List<string>{"Tổng tiền", "Tổng số tiền"}),
                 ["Số đơn"] = GetUsefulCategory(indicators, new List<string>{"Đơn BH"}),
@@ -139,7 +243,7 @@ namespace TransformInsureJToMyReport.ViewModel
                 ["Ngày cấp đơn"] = GetUsefulCategory(indicators, new List<string>{"N.Nhập"}),
                 ["Hiệu lực từ"] = GetUsefulCategory(indicators, new List<string>{"N.Bắt đầu BH", "N.Hiệu lực"}),
                 ["Hiệu lực đến"] = GetUsefulCategory(indicators, new List<string>{"N.Hết hiệu lực"}),
-                ["Loại tiền"] = GetUsefulCategory(indicators, new List<string>{"Loại tiền BH"}),
+                ["Loại tiền"] = GetUsefulCategory(indicators, new List<string>{"Loại tiền"}),
                 ["ST phải trả"] = GetUsefulCategory(indicators, new List<string>{"Phí PS NET"}),
                 ["Hạn thanh toán"] = GetUsefulCategory(indicators, new List<string>{"Ngày đến hạn TT"}),
                 ["Ngày ký"] = GetUsefulCategory(indicators, new List<string>{"N.Nhập"}),
@@ -152,7 +256,7 @@ namespace TransformInsureJToMyReport.ViewModel
             => InsureJFiles.Any() && IJNotInReport != null && IJNotInReport.Any();
 
         [RelayCommand(CanExecute = nameof(CanExportReport))]
-        private void ExportReport()
+        private async Task ExportReport()
         {
             HashSet<string> indicators = new HashSet<string>();
             var titleColumn = new Dictionary<string, int>();
@@ -167,111 +271,131 @@ namespace TransformInsureJToMyReport.ViewModel
                 fileName = dialog.FileName;                
             }
 
-            //Read InsureJ Files one by one
-            foreach (string insureJFile in InsureJFiles)
+            await Task.Run(() =>
             {
-                if (File.Exists(insureJFile))
+                //Read InsureJ Files one by one
+                foreach (string insureJFile in InsureJFiles)
                 {
-                    using (ExcelPackage package = new ExcelPackage(insureJFile))
+                    if (File.Exists(insureJFile))
                     {
-                        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-                        int rowCount = worksheet.Dimension.End.Row;
-                        int colCount = worksheet.Dimension.End.Column;
-
-                        for (int col = 1; col < colCount; col++)
-                        {
-                            if (worksheet.Cells[1, col].Value != null)
-                            {
-                                indicators.Add(worksheet.Cells[1, col].Value.ToString());
-                            }
-                        }                        
-
-                        titleColumn = CustomTitleColumn(indicators);
-
-                        //Pull data to _allMatchDataFetchFromIJFile
-                        for (int row = 2; row < rowCount; row++)
-                        {
-                            string policyNumber = worksheet.Cells[row, titleColumn["Số đơn"]].Value.ToString();
-
-                            if (IJNotInReport.Contains(policyNumber))
-                            {       
-                                var record = new List<string>();
-                                foreach (var t in titleColumn)
-                                {
-                                    string s = worksheet.Cells[row, t.Value].Value.ToString();
-                                    record.Add(s);
-                                }
-                                _allMatchDataFetchFromIJFile.Add(record);
-                            }
-                        }
-                    }                    
-                }
-            }
-
-            _allTitle = titleColumn;
-
-            //Export report
-            if (_allMatchDataFetchFromIJFile.Count > 0 && !string.IsNullOrWhiteSpace(fileName) && fileName.IndexOfAny(Path.GetInvalidPathChars()) < 0)
-            {
-                var checkingPath = new FileInfo(fileName).DirectoryName;
-                var checkingFileName = new FileInfo(fileName).Name;
-
-                FileInfo newFile = new FileInfo(fileName);
-
-
-                try
-                {
-                    if (newFile.Exists)
-                    {
-                        newFile.Delete();
-                        newFile = new FileInfo(fileName);
-                    }
-
-                    if (checkingFileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0 && !string.IsNullOrWhiteSpace(checkingFileName))
-                    {
-                        using (ExcelPackage package = new ExcelPackage(fileName))
+                        using (ExcelPackage package = new ExcelPackage(insureJFile))
                         {
                             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                            package.Workbook.Properties.Author = "Trần Khoa Minh";
-                            package.Workbook.Worksheets.Add("Báo cáo");
-                            var worksheet = package.Workbook.Worksheets[0];
-                            int row = 2;
-                            int col = 1;
+                            ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                            int rowCount = worksheet.Dimension.End.Row;
+                            int colCount = worksheet.Dimension.End.Column;
 
-                            foreach(var title in _allTitle)
+                            for (int col = 1; col < colCount; col++)
                             {
-                                worksheet.Cells[1, col].Value = title.Key;
-                                col++;
-                            }
-
-                            col = 1;
-
-                            foreach (var data in _allMatchDataFetchFromIJFile)
-                            {
-                                foreach (var element in data)
+                                if (worksheet.Cells[1, col].Value != null)
                                 {
-                                    worksheet.Cells[row, col].Value = element;
-                                    col++;
+                                    indicators.Add(worksheet.Cells[1, col].Value.ToString());
                                 }
-                                col = 1;
-                                row++;
                             }
-                            package.Save();
+
+                            titleColumn = CustomTitleColumn(indicators);
+
+                            //Pull data to _allMatchDataFetchFromIJFile
+                            for (int row = 2; row < rowCount; row++)
+                            {
+                                string policyNumber = worksheet.Cells[row, titleColumn["Số đơn"]].Value.ToString();
+
+                                if (IJNotInReport.Contains(policyNumber))
+                                {
+                                    var record = new List<string>();
+                                    foreach (var t in titleColumn)
+                                    {
+                                        string s = worksheet.Cells[row, t.Value].Value.ToString();
+                                        record.Add(s);
+                                    }
+                                    _allMatchDataFetchFromIJFile.Add(record);
+                                    IJNotInReport.Remove(policyNumber);
+                                }
+                            }
                         }
                     }
-                    else
+                }
+
+                _allTitle = titleColumn;
+
+                //Export report
+                if (_allMatchDataFetchFromIJFile.Count > 0 && !string.IsNullOrWhiteSpace(fileName) && fileName.IndexOfAny(Path.GetInvalidPathChars()) < 0)
+                {
+                    var checkingPath = new FileInfo(fileName).DirectoryName;
+                    var checkingFileName = new FileInfo(fileName).Name;
+
+                    FileInfo newFile = new FileInfo(fileName);
+
+
+                    try
                     {
-                        MessageBox.Show("Đường dẫn không hợp lệ");
+                        if (newFile.Exists)
+                        {
+                            newFile.Delete();
+                            newFile = new FileInfo(fileName);
+                        }
+
+                        if (checkingFileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0 && !string.IsNullOrWhiteSpace(checkingFileName))
+                        {
+                            using (ExcelPackage package = new ExcelPackage(fileName))
+                            {
+                                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                                package.Workbook.Properties.Author = "Trần Khoa Minh";
+                                package.Workbook.Worksheets.Add("Báo cáo");
+                                var worksheet = package.Workbook.Worksheets[0];
+                                int row = 2;
+                                int col = 1;
+
+                                foreach (var title in _allTitle)
+                                {
+                                    worksheet.Cells[1, col].Value = title.Key.ToUpper();
+                                    col++;
+                                }
+
+                                //Format style title
+                                worksheet.Row(1).Height = 25;
+                                col--;
+                                var titleRange = worksheet.Cells[1, 1, 1, col];
+                                titleRange.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                                titleRange.Style.Fill.BackgroundColor.SetColor(Color.Aqua);
+                                titleRange.Style.Font.Bold = true;
+                                titleRange.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                                titleRange.Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+
+                                col = 1;
+
+                                var customListConverted = CustomListConverted(_allMatchDataFetchFromIJFile);
+                                foreach (var data in customListConverted)
+                                {
+                                    foreach (var element in data)
+                                    {
+                                        worksheet.Cells[row, col].Value = element;
+                                        col++;
+                                    }
+                                    col = 1;
+                                    row++;
+                                }
+
+                                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+                                package.Save();
+
+                                Message.Enqueue("Xuất báo cáo thành công");
+                            }
+                        }
+                        else
+                        {
+                            Message.Enqueue("Đường dẫn không hợp lệ");
+                        }
+                    }
+                    catch
+                    {
+                        Message.Enqueue("File đang mở");
                     }
                 }
-                catch
-                {
-                    MessageBox.Show("File đang mở", "Lỗi !");
-                }                
-            }
-        }
 
+            }
+            );            
+        }
         #endregion
         
 

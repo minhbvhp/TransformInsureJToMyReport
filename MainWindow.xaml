@@ -77,7 +77,14 @@
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Thêm" Margin="10 0" Command="{Binding AddFileCommand}"/>
             <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="90" Content="Xóa" Margin="10 0" Command="{Binding RemoveFileCommand}"/>
-            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="120" Content="Xuất báo cáo" Margin="10 0" Command="{Binding ExportReportCommand}"/>
+            <Button Style="{StaticResource MaterialDesignRaisedLightButton}" Width="120" Content="Xuất báo cáo" Margin="10 0"
+                    materialDesign:ButtonProgressAssist.IsIndicatorVisible="True"
+                    materialDesign:ButtonProgressAssist.IsIndeterminate="{Binding ExportReportCommand.IsRunning}"
+                    Command="{Binding ExportReportCommand}"/>
         </StackPanel>
+
+        <Canvas Grid.Row="3">
+            <materialDesign:Snackbar Canvas.Bottom="0" Canvas.Left="100" MessageQueue="{Binding Message}"/>
+        </Canvas>
     </Grid>
 </Window>
