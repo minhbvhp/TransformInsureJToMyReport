@@ -9,13 +9,15 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-
+using System.Windows.Controls;
 
 namespace TransformInsureJToMyReport.ViewModel
 {
     internal partial class MainViewModel : ObservableObject
     {
-        private Tuple<string, int> GetUsefulCategory(HashSet<string> strings, List<string> substrings, string title)
+        private Dictionary<string, int> _allTitle = new Dictionary<string, int>();
+        private List<List<string>> _allMatchDataFetchFromIJFile = new();
+        private int GetUsefulCategory(HashSet<string> strings, List<string> substrings)
         {
             int i = 0;
             foreach (var item in strings)
@@ -23,7 +25,7 @@ namespace TransformInsureJToMyReport.ViewModel
                 i++;
                 if (substrings.Any(s => item.Contains(s, StringComparison.OrdinalIgnoreCase)))
                 {
-                    return Tuple.Create(title, i);
+                    return i;
                 }
             }
             throw new ArgumentNullException("Substring not match strings");
@@ -38,6 +40,7 @@ namespace TransformInsureJToMyReport.ViewModel
 
         #region IJNotInReport
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(ExportReportCommand))]
         private List<string> iJNotInReport;
         private IEnumerable<string> ReadUploadIJNotInReportFile(string filePath)
         {
@@ -122,37 +125,37 @@ namespace TransformInsureJToMyReport.ViewModel
 
         #region ExportReport
 
-        private HashSet<Tuple<string, int>> CustomTitleColumn(HashSet<string> indicators)
+        private Dictionary<string, int> CustomTitleColumn(HashSet<string> indicators)
         {
-            return new HashSet<Tuple<string, int>>
+            return new Dictionary<string, int>
             {
-                GetUsefulCategory(indicators, new List<string>{"N.Nhập"}, "Ngày tạo đơn"),
-                GetUsefulCategory(indicators, new List<string>{"Đơn vị KD cấp dưới"}, "PKD"),
-                GetUsefulCategory(indicators, new List<string>{"Sản phẩm", "Tên sản phẩm"}, "Sản phẩm bảo hiểm"),
-                GetUsefulCategory(indicators, new List<string>{"Đại lý", "Bên trung gian"}, "Đại lý/Trung gian/Ủy quyền"),
-                GetUsefulCategory(indicators, new List<string>{"Tổng tiền", "Tổng số tiền"}, "Số tiền bảo hiểm"),
-                GetUsefulCategory(indicators, new List<string>{"Đơn BH"}, "Số đơn"),
-                GetUsefulCategory(indicators, new List<string>{"Cty Đồng BH"}, "Đồng BH"),
-                GetUsefulCategory(indicators, new List<string>{"N.Nhập"}, "Ngày cấp đơn"),
-                GetUsefulCategory(indicators, new List<string>{"N.Bắt đầu BH", "N.Hiệu lực"}, "Hiệu lực từ"),
-                GetUsefulCategory(indicators, new List<string>{"N.Hết hiệu lực"}, "Hiệu lực từ"),
-                GetUsefulCategory(indicators, new List<string>{"Loại tiền BH"}, "Loại tiền"),
-                GetUsefulCategory(indicators, new List<string>{"Phí PS NET"}, "ST phải trả"),
-                GetUsefulCategory(indicators, new List<string>{"Ngày đến hạn TT"}, "Hạn thanh toán"),
-                GetUsefulCategory(indicators, new List<string>{"N.Nhập"}, "Ngày ký"),
-                GetUsefulCategory(indicators, new List<string>{"Nhân viên QLDV"}, "Người nhận"),
+                ["Ngày tạo đơn"] = GetUsefulCategory(indicators, new List<string>{"N.Nhập"}),
+                ["PKD"] = GetUsefulCategory(indicators, new List<string>{"Đơn vị KD cấp dưới"}),
+                ["Sản phẩm bảo hiểm"] = GetUsefulCategory(indicators, new List<string>{"Sản phẩm", "Tên sản phẩm"}),
+                ["Trung gian"] = GetUsefulCategory(indicators, new List<string>{"Đại lý", "Bên trung gian"}),
+                ["Số tiền bảo hiểm"] = GetUsefulCategory(indicators, new List<string>{"Tổng tiền", "Tổng số tiền"}),
+                ["Số đơn"] = GetUsefulCategory(indicators, new List<string>{"Đơn BH"}),
+                ["Đồng BH"] = GetUsefulCategory(indicators, new List<string>{"Cty Đồng BH"}),
+                ["Ngày cấp đơn"] = GetUsefulCategory(indicators, new List<string>{"N.Nhập"}),
+                ["Hiệu lực từ"] = GetUsefulCategory(indicators, new List<string>{"N.Bắt đầu BH", "N.Hiệu lực"}),
+                ["Hiệu lực đến"] = GetUsefulCategory(indicators, new List<string>{"N.Hết hiệu lực"}),
+                ["Loại tiền"] = GetUsefulCategory(indicators, new List<string>{"Loại tiền BH"}),
+                ["ST phải trả"] = GetUsefulCategory(indicators, new List<string>{"Phí PS NET"}),
+                ["Hạn thanh toán"] = GetUsefulCategory(indicators, new List<string>{"Ngày đến hạn TT"}),
+                ["Ngày ký"] = GetUsefulCategory(indicators, new List<string>{"N.Nhập"}),
+                ["Người nhận"] = GetUsefulCategory(indicators, new List<string>{"Nhân viên QLDV"}),
 
             };
         }
 
         private bool CanExportReport()
-            => InsureJFiles.Any();
+            => InsureJFiles.Any() && IJNotInReport != null && IJNotInReport.Any();
 
         [RelayCommand(CanExecute = nameof(CanExportReport))]
         private void ExportReport()
         {
             HashSet<string> indicators = new HashSet<string>();
-            HashSet<Tuple<string, int>> titleColumn = new HashSet<Tuple<string, int>>();
+            var titleColumn = new Dictionary<string, int>();
 
             string? fileName = "";
             var dialog = new SaveFileDialog();
@@ -164,7 +167,7 @@ namespace TransformInsureJToMyReport.ViewModel
                 fileName = dialog.FileName;                
             }
 
-
+            //Read InsureJ Files one by one
             foreach (string insureJFile in InsureJFiles)
             {
                 if (File.Exists(insureJFile))
@@ -183,45 +186,89 @@ namespace TransformInsureJToMyReport.ViewModel
                                 indicators.Add(worksheet.Cells[1, col].Value.ToString());
                             }
                         }                        
-                    }
-                    titleColumn = CustomTitleColumn(indicators);                    
+
+                        titleColumn = CustomTitleColumn(indicators);
+
+                        //Pull data to _allMatchDataFetchFromIJFile
+                        for (int row = 2; row < rowCount; row++)
+                        {
+                            string policyNumber = worksheet.Cells[row, titleColumn["Số đơn"]].Value.ToString();
+
+                            if (IJNotInReport.Contains(policyNumber))
+                            {       
+                                var record = new List<string>();
+                                foreach (var t in titleColumn)
+                                {
+                                    string s = worksheet.Cells[row, t.Value].Value.ToString();
+                                    record.Add(s);
+                                }
+                                _allMatchDataFetchFromIJFile.Add(record);
+                            }
+                        }
+                    }                    
                 }
             }
 
-            if (titleColumn.Count > 0 && !string.IsNullOrWhiteSpace(fileName) && fileName.IndexOfAny(Path.GetInvalidPathChars()) < 0)
+            _allTitle = titleColumn;
+
+            //Export report
+            if (_allMatchDataFetchFromIJFile.Count > 0 && !string.IsNullOrWhiteSpace(fileName) && fileName.IndexOfAny(Path.GetInvalidPathChars()) < 0)
             {
                 var checkingPath = new FileInfo(fileName).DirectoryName;
                 var checkingFileName = new FileInfo(fileName).Name;
 
                 FileInfo newFile = new FileInfo(fileName);
-                if (newFile.Exists)
-                {
-                    newFile.Delete();
-                    newFile = new FileInfo(fileName);
-                }
 
-                if (checkingFileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0 && !string.IsNullOrWhiteSpace(checkingFileName))
+
+                try
                 {
-                    using (ExcelPackage package = new ExcelPackage(fileName))
+                    if (newFile.Exists)
                     {
-                        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                        package.Workbook.Properties.Author = "Trần Khoa Minh";
-                        package.Workbook.Worksheets.Add("Báo cáo");
-                        var worksheet = package.Workbook.Worksheets[0];
-                        int col = 0;
-                        
-                        foreach (var t in titleColumn)
+                        newFile.Delete();
+                        newFile = new FileInfo(fileName);
+                    }
+
+                    if (checkingFileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0 && !string.IsNullOrWhiteSpace(checkingFileName))
+                    {
+                        using (ExcelPackage package = new ExcelPackage(fileName))
                         {
-                            col++;
-                            worksheet.Cells[1, col].Value = t.Item1.ToString();
+                            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                            package.Workbook.Properties.Author = "Trần Khoa Minh";
+                            package.Workbook.Worksheets.Add("Báo cáo");
+                            var worksheet = package.Workbook.Worksheets[0];
+                            int row = 2;
+                            int col = 1;
+
+                            foreach(var title in _allTitle)
+                            {
+                                worksheet.Cells[1, col].Value = title.Key;
+                                col++;
+                            }
+
+                            col = 1;
+
+                            foreach (var data in _allMatchDataFetchFromIJFile)
+                            {
+                                foreach (var element in data)
+                                {
+                                    worksheet.Cells[row, col].Value = element;
+                                    col++;
+                                }
+                                col = 1;
+                                row++;
+                            }
+                            package.Save();
                         }
-                        package.Save();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Đường dẫn không hợp lệ");
                     }
                 }
-                else
+                catch
                 {
-                   MessageBox.Show("Đường dẫn không hợp lệ");
-                }
+                    MessageBox.Show("File đang mở", "Lỗi !");
+                }                
             }
         }
 
