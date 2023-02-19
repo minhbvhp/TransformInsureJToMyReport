@@ -23,7 +23,11 @@
 
         <StackPanel Grid.Row="0" HorizontalAlignment="Right" Orientation="Horizontal">
             <Button Style="{StaticResource MaterialDesignIconButton}" HorizontalAlignment="Right"
-                    Width="30" Height="30" IsTabStop="False" Click="Button_Click">
+                    Width="30" Height="30" IsTabStop="False" Click="MinimizeButton_Click">
+                <materialDesign:PackIcon Kind="Minimize" Height="20"/>
+            </Button>
+            <Button Style="{StaticResource MaterialDesignIconButton}" HorizontalAlignment="Right"
+                    Width="30" Height="30" IsTabStop="False" Click="CloseButton_Click">
                 <materialDesign:PackIcon Kind="CloseOctagonOutline" Height="20"/>
             </Button>
         </StackPanel>
@@ -32,7 +36,7 @@
             <TextBlock FontSize="20" FontWeight="Medium" Foreground="DarkRed"                    
                        Text="LẬP BÁO CÁO" HorizontalAlignment="Center"/>
 
-            <Border BorderBrush="White" BorderThickness="0 0 0 0.5" Margin="5 5"/>
+            <Border BorderBrush="LightPink" BorderThickness="0 0 0 0.5" Margin="5 5"/>
         </StackPanel>
 
         <StackPanel Grid.Row="2">
@@ -47,7 +51,7 @@
                         <TextBlock Text="Đơn chưa nhập:" Margin="10 0" FontSize="10"/>
                     </StackPanel>
 
-                    <Border BorderBrush="DeepSkyBlue" BorderThickness="0.5" Margin="10 5" Padding="0" Height="150">
+                    <Border BorderBrush="LightPink" BorderThickness="0.5" Margin="10 5" Padding="0" Height="150">
                         <ListBox FontSize="10" ItemsSource="{Binding IJNotInReport}"/>
                     </Border>
 
@@ -62,7 +66,7 @@
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="File đầu vào:" Margin="10 0" FontSize="10"/>
 
-                    <Border BorderBrush="DeepSkyBlue" BorderThickness="0.5" Margin="10 5" Height="150">
+                    <Border BorderBrush="LightPink" BorderThickness="0.5" Margin="10 5" Height="150">
                         <ListBox x:Name="SourceFiles" FontSize="12"
                                  ItemsSource="{Binding InsureJFiles, UpdateSourceTrigger=PropertyChanged}"
                                  SelectedItem="{Binding SelectedInsureJFile, UpdateSourceTrigger=PropertyChanged}"/>
@@ -70,7 +74,7 @@
                 </StackPanel>
 
             </Grid>
-                <Border BorderBrush="White" BorderThickness="0 0.5 0 0" Margin="10 8" Grid.ColumnSpan="2"/>
+            <Border BorderBrush="LightPink" BorderThickness="0 0.5 0 0" Margin="10 8" Grid.ColumnSpan="2"/>
         </StackPanel>
         
 
