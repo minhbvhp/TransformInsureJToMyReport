@@ -93,11 +93,15 @@ namespace TransformInsureJToMyReport.ViewModel
                             row[i] = "P. SỐ 6";
                             break;
 
+                        case "HP Phòng phát triển kênh phân phối (cũ)":
+                            row[i] = "P. SỐ 6";
+                            break;
+
                         case "HP Phòng Bảo hiểm số 7":
                             row[i] = "P. SỐ 7";
                             break;
 
-                        case "HP Phòng Bảo hiểm số 8":
+                        case "HP Phòng bảo hiểm số 8":
                             row[i] = "P. SỐ 8";
                             break;
 
@@ -117,15 +121,13 @@ namespace TransformInsureJToMyReport.ViewModel
 
             return list;
         }
-        private int GetUsefulCategory(HashSet<string> strings, List<string> substrings)
+        private int GetUsefulCategory(List<string> strings, List<string> substrings)
         {
-            int i = 0;
             foreach (var item in strings)
             {
-                i++;
                 if (substrings.Any(s => item.Contains(s, StringComparison.OrdinalIgnoreCase)))
                 {
-                    return i;
+                    return strings.IndexOf(item) + 1;
                 }
             }
             return 1;
@@ -228,7 +230,7 @@ namespace TransformInsureJToMyReport.ViewModel
 
         #region ExportReport
 
-        private Dictionary<string, int> CustomTitleColumn(HashSet<string> indicators)
+        private Dictionary<string, int> CustomTitleColumn(List<string> indicators)
         {
             return new Dictionary<string, int>
             {
@@ -257,8 +259,7 @@ namespace TransformInsureJToMyReport.ViewModel
 
         [RelayCommand(CanExecute = nameof(CanExportReport))]
         private async Task ExportReport()
-        {
-            HashSet<string> indicators = new HashSet<string>();
+        {            
             var titleColumn = new Dictionary<string, int>();
             var tempIJNotInReport = new List<string>(IJNotInReport);
 
@@ -285,6 +286,7 @@ namespace TransformInsureJToMyReport.ViewModel
                             ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
                             int rowCount = worksheet.Dimension.End.Row;
                             int colCount = worksheet.Dimension.End.Column;
+                            List<string> indicators = new List<string>();
 
                             for (int col = 1; col < colCount; col++)
                             {
