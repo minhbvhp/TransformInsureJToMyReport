@@ -372,6 +372,7 @@ namespace TransformInsureJToMyReport.ViewModel
 
                             col = 1;
 
+                            //Load data from List to range
                             var customListConverted = CustomListConverted(_allMatchDataFetchFromIJFile);
                             foreach (var data in customListConverted)
                             {
