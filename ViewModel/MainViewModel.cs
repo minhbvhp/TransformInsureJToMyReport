@@ -30,11 +30,11 @@ namespace TransformInsureJToMyReport.ViewModel
                     switch (row[i].ToString())
                     {
                         case "Bảo hiểm cháy nổ bắt buộc":
-                            row[i] = "BH Cháy nổ bắt buộc(CNBB) +BH cháy và các RR đặc biệt(FI)";
+                            row[i] = "BH Cháy nổ bắt buộc (CNBB) + BH cháy và các RR đặc biệt (FI)";
                             break;
 
                         case "Bảo hiểm Cháy và rủi ro đặc biệt":
-                            row[i] = "BH Cháy nổ bắt buộc(CNBB) +BH cháy và các RR đặc biệt(FI)";
+                            row[i] = "BH Cháy nổ bắt buộc (CNBB) + BH cháy và các RR đặc biệt (FI)";
                             break;
 
                         case "Bảo hiểm máy móc và thiết bị xây dựng":
