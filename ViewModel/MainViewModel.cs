@@ -245,7 +245,7 @@ namespace TransformInsureJToMyReport.ViewModel
                 ["Hiệu lực đến"] = GetUsefulCategory(indicators, new List<string>{"N.Hết hiệu lực"}),
                 ["Loại tiền"] = GetUsefulCategory(indicators, new List<string>{"Loại tiền"}),
                 ["ST phải trả"] = GetUsefulCategory(indicators, new List<string>{"Phí PS NET"}),
-                ["Hạn thanh toán"] = GetUsefulCategory(indicators, new List<string>{"Ngày đến hạn TT"}),
+                ["Hạn thanh toán"] = GetUsefulCategory(indicators, new List<string>{"đến hạn"}),
                 ["Ngày ký"] = GetUsefulCategory(indicators, new List<string>{"N.Nhập"}),
                 ["Người nhận"] = GetUsefulCategory(indicators, new List<string>{"Nhân viên QLDV"}),
 
