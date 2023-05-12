@@ -41,6 +41,10 @@ namespace TransformInsureJToMyReport.ViewModel
                             row[i] = "BH Máy móc và thiết bị xây dựng (CPM)";
                             break;
 
+                        case "Bảo hiểm Đổ vỡ máy móc":
+                            row[i] = "BH Hư hỏng máy móc (MB)";
+                            break;
+
                         case "Bảo hiểm công trình dân dụng hoàn thành":
                             row[i] = "BH Công trình xây dựng đã hoàn thành (CECR)";
                             break;
@@ -230,26 +234,26 @@ namespace TransformInsureJToMyReport.ViewModel
 
         #region ExportReport
 
-        private Dictionary<string, int> CustomTitleColumn(List<string> indicators)
+        private Dictionary<string, int> CustomTitleColumn()
         {
             return new Dictionary<string, int>
             {
-                ["Ngày tạo đơn"] = GetUsefulCategory(indicators, new List<string>{"N.Nhập"}),
-                ["PKD"] = GetUsefulCategory(indicators, new List<string>{"Đơn vị KD cấp dưới"}),
-                ["Sản phẩm bảo hiểm"] = GetUsefulCategory(indicators, new List<string>{"Sản phẩm", "Tên sản phẩm"}),
-                ["Khách hàng"] = GetUsefulCategory(indicators, new List<string> { "mua BH" }),
-                ["Trung gian"] = GetUsefulCategory(indicators, new List<string>{"Đại lý", "Bên trung gian"}),
-                ["Số tiền bảo hiểm"] = GetUsefulCategory(indicators, new List<string>{"Tổng tiền", "Tổng số tiền"}),
-                ["Số đơn"] = GetUsefulCategory(indicators, new List<string>{"Đơn BH"}),
-                ["Đồng BH"] = GetUsefulCategory(indicators, new List<string>{"Cty Đồng BH"}),
-                ["Ngày cấp đơn"] = GetUsefulCategory(indicators, new List<string>{"N.Nhập"}),
-                ["Hiệu lực từ"] = GetUsefulCategory(indicators, new List<string>{"N.Bắt đầu BH", "N.Hiệu lực"}),
-                ["Hiệu lực đến"] = GetUsefulCategory(indicators, new List<string>{"N.Hết hiệu lực"}),
-                ["Loại tiền"] = GetUsefulCategory(indicators, new List<string>{"Loại tiền"}),
-                ["ST phải trả"] = GetUsefulCategory(indicators, new List<string>{"Phí PS NET"}),
-                ["Hạn thanh toán"] = GetUsefulCategory(indicators, new List<string>{"đến hạn"}),
-                ["Ngày ký"] = GetUsefulCategory(indicators, new List<string>{"N.Nhập"}),
-                ["Người nhận"] = GetUsefulCategory(indicators, new List<string>{"Nhân viên QLDV"}),
+                ["Ngày tạo đơn"] = 11,
+                ["PKD"] = 2,
+                ["Sản phẩm bảo hiểm"] = 5,
+                ["Khách hàng"] = 9,
+                ["Trung gian"] = 10,
+                ["Số tiền bảo hiểm"] = 15,
+                ["Số đơn"] = 7,
+                ["Đồng BH"] = 24,
+                ["Ngày cấp đơn"] = 13,
+                ["Hiệu lực từ"] = 12,
+                ["Hiệu lực đến"] = 14,
+                ["Loại tiền"] = 16,
+                ["ST phải trả"] = 21,
+                ["Hạn thanh toán"] = 34,
+                ["Ngày ký"] = 13,
+                ["Người nhận"] = 4,
 
             };
         }
@@ -290,16 +294,16 @@ namespace TransformInsureJToMyReport.ViewModel
 
                             for (int col = 1; col < colCount; col++)
                             {
-                                if (worksheet.Cells[1, col].Value != null)
+                                if (worksheet.Cells[4, col].Value != null)
                                 {
-                                    indicators.Add(worksheet.Cells[1, col].Value.ToString());
+                                    indicators.Add(worksheet.Cells[4, col].Value.ToString());
                                 }
                             }
 
-                            titleColumn = CustomTitleColumn(indicators);
+                            titleColumn = CustomTitleColumn();
 
                             //Pull data to _allMatchDataFetchFromIJFile
-                            for (int row = 2; row < rowCount; row++)
+                            for (int row = 5; row < rowCount; row++)
                             {
                                 string policyNumber = worksheet.Cells[row, titleColumn["Số đơn"]].Value.ToString();
 
